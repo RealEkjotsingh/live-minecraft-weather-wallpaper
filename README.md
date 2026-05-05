@@ -1,46 +1,61 @@
-🌦️ Minecraft Live Weather Wallpaper
-![Preview](./preview.gif)
-🎮 Designed for Wallpaper Engine — not a standard web app
+# 🌦️ Minecraft Live Weather Wallpaper
 
-A dynamic Minecraft-style live wallpaper that reacts to real-world weather in real-time using live API data.
+![Preview](./preview.gif)
+
+> 🎮 Designed for Wallpaper Engine — not a standard web app
+
+A dynamic Minecraft-style live wallpaper that reacts to real-world weather in real-time using live API data.  
 Built as an upgraded, modernized version of the classic Minecraft digital clock concept — now with real weather simulation, smart fallbacks, and immersive UI.
 
-✨ Features
-🌍 Auto Location Detection (IP-based)
-🧠 Smart Fallback System
-Time-based location switching (morning / evening)
-Weekend vs weekday logic
-🌧️ Rain Intensity Simulation
-Drizzle → Light → Moderate → Heavy rain
-☁️ Cloud-Based Background Logic
-Clear (<25%) shows sunny environment
-🌡️ Live Weather Data
-Temperature
-Humidity
-Wind speed
-UV index
-🌦️ Precipitation Tracking
-Rain probability (%)
-Actual rainfall (mm)
-🕒 Time-Based Environment
-Morning / Afternoon / Evening / Night
-🎮 Minecraft-Style UI
-Clean overlay
-Dynamic logs
-Smooth animations
-🖱️ Manual Location Selector
-Long press anywhere to open location menu
-🖥 Requirements
-Wallpaper Engine (Steam)
-▶️ Setup
+---
+
+## ✨ Features
+
+- 🌍 **Auto Location Detection (IP-based)**  
+- 🧠 **Smart Fallback System**
+  - Time-based location switching (morning / evening)
+  - Weekend vs weekday logic  
+
+- 🌧️ **Rain Intensity Simulation**
+  - Drizzle → Light → Moderate → Heavy rain  
+
+- ☁️ **Cloud-Based Background Logic**
+  - Clear (<25%) shows sunny environment  
+
+- 🌡️ **Live Weather Data**
+  - Temperature  
+  - Humidity  
+  - Wind speed  
+  - UV index  
+
+- 🌦️ **Precipitation Tracking**
+  - Rain probability (%)  
+  - Actual rainfall (mm)  
+
+- 🕒 **Time-Based Environment**
+  - Morning / Afternoon / Evening / Night  
+
+- 🎮 **Minecraft-Style UI**
+  - Clean overlay  
+  - Dynamic logs  
+  - Smooth animations  
+
+- 🖱️ **Manual Location Selector**
+  - Long press anywhere to open location menu  
+
+---
+
+## 🖥 Requirements
+
+- [Wallpaper Engine (Steam)](https://store.steampowered.com/app/431960/Wallpaper_Engine/)
+
+---
+
+## ▶️ Setup
 
 Clone or download this repository:
-
-git clone https://github.com/RealEkjotsingh/live-minecraft-weather-wallpaper.git
 Open Wallpaper Engine
-
 Go to:
-
 My Projects → Create Wallpaper
 Select the project folder
 Run and enjoy 🚀
@@ -53,19 +68,17 @@ Uses IP-based APIs (ipwho, ipapi)
 Detects your city automatically
 Displays detected city in UI
 
-⚠️ Note: Auto detection may fail inside Wallpaper Engine due to network/permission limits
+⚠️ Auto detection may fail inside Wallpaper Engine due to network/permission limitations
 
 🔁 Smart Fallback Logic
 
-If auto fails:
+If auto detection fails:
 
 🕘 After 9 AM → Noida
-🌆 Evening (after 6 PM) → Faridabad
+🌆 After 6 PM → Faridabad
 📅 Saturday & Sunday → Faridabad
-
-You can change this inside code:
-
-// Example fallback logic
+Example Code
+```
 const hour = new Date().getHours();
 const day = new Date().getDay(); // 0 = Sunday
 
@@ -76,6 +89,7 @@ if (day === 0 || day === 6) {
 } else {
   fetchWeather(28.57, 77.32); // Day → Noida
 }
+```
 🖱️ Manual Location Selection
 Long press anywhere on screen
 Location selector will appear
@@ -91,18 +105,19 @@ You can modify:
 ☁️ Cloud percentage logic
 🎨 UI text & layout
 📊 Weather Logic (Important)
-Rain Detection
+🌧️ Rain Detection
+
 Based on:
+
 precip_mm (actual rainfall)
 chance_of_rain (%)
-Example:
 Condition	Output
 0 mm	No rain
 0–1 mm	Drizzle
 1–5 mm	Light Rain
 5–15 mm	Moderate Rain
 15+ mm	Heavy Rain
-Cloud Logic
+☁️ Cloud Logic
 Cloud %	Visual
 < 25%	Clear sky
 25–60%	Few clouds
@@ -118,7 +133,7 @@ Wallpaper Engine
 🎯 GPU-based particle optimization
 📌 Notes
 Auto detection may not always work due to Wallpaper Engine restrictions
-API-based weather can have slight delays
+API-based weather may have slight delays
 Optimized for performance (low GPU usage)
 ❤️ Support / Donate
 
