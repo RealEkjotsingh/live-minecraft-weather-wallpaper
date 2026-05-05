@@ -1,0 +1,88 @@
+@font-face {
+  font-family: Minecraft;
+  src: url("../3339891336_minecraft_digital_clock/resources/fonts/Minecraftia-Regular.ttf");
+}
+body,
+div {
+  margin: 0;
+  overflow: hidden;
+  background-color: black;
+  color: white;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+p {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+video,
+img {
+  position: absolute;
+  width: 100%;
+  height: auto;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+div {
+  animation: fadeIn 4s;
+}
+
+@media (max-aspect-ratio: 16/9) {
+  video,
+  img {
+    width: auto;
+    height: 100%;
+  }
+}
+/* minimal, cheap fade */
+.clock-layer {
+  transition: opacity 0.15s linear; /* faster */
+}
+
+.clock-layer.fade-out {
+  opacity: 0.6; /* NOT 0 (avoid black flash) */
+}
+/* ✅ allow interaction ONLY for UI */
+#locationSelector,
+#locationSelector span,
+#modeToggle {
+  pointer-events: pointer !important;
+}
+#locationSelector {
+  /* display: inline-flex !important; */
+  height: auto !important;
+  min-height: unset !important;
+  max-height: fit-content !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 6px 14px !important;
+}
+
+/* #weatherData {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+} */
