@@ -1,67 +1,133 @@
-# Minecraft digital clock
-
+🌦️ Minecraft Live Weather Wallpaper
 ![Preview](./preview.gif)
+🎮 Designed for Wallpaper Engine — not a standard web app
 
-**Minecraft digital clock** is an updated version of the [**Minecraft Redstone Clock**](https://steamcommunity.com/sharedfiles/filedetails/?id=1731760875) wallpaper for Wallpaper Engine. This version includes improved video quality, piston sound effects, optional background sound, and dynamic weather-based background changes powered by the OpenWeatherMap API. It maintains the Minecraft-inspired digital clock within an animated environment. The wallpaper is set in a Minecraft taiga biome and uses Chocapic13 V9 Extreme shaders.
+A dynamic Minecraft-style live wallpaper that reacts to real-world weather in real-time using live API data.
+Built as an upgraded, modernized version of the classic Minecraft digital clock concept — now with real weather simulation, smart fallbacks, and immersive UI.
 
-### **[Try the wallpaper with a changing day cycle here!](https://blazjerman.github.io/Minecraft-digital-clock/)**
+✨ Features
+🌍 Auto Location Detection (IP-based)
+🧠 Smart Fallback System
+Time-based location switching (morning / evening)
+Weekend vs weekday logic
+🌧️ Rain Intensity Simulation
+Drizzle → Light → Moderate → Heavy rain
+☁️ Cloud-Based Background Logic
+Clear (<25%) shows sunny environment
+🌡️ Live Weather Data
+Temperature
+Humidity
+Wind speed
+UV index
+🌦️ Precipitation Tracking
+Rain probability (%)
+Actual rainfall (mm)
+🕒 Time-Based Environment
+Morning / Afternoon / Evening / Night
+🎮 Minecraft-Style UI
+Clean overlay
+Dynamic logs
+Smooth animations
+🖱️ Manual Location Selector
+Long press anywhere to open location menu
+🖥 Requirements
+Wallpaper Engine (Steam)
+▶️ Setup
 
-## What's New in This Version?
+Clone or download this repository:
 
-- **Weather-Responsive Backgrounds**: With the OpenWeatherMap API, the wallpaper updates the background based on real-time weather conditions in your town, such as sunny, rainy, cloudy, or snowy weather.
-- **Piston Sound Effects**: The clock now includes piston sounds every time the clock changes, enhancing the Minecraft redstone effect.
-- **Optional Background Sound**: Add your own ambient background audio in `.ogg` format for a richer experience.
-- **Improved Video Quality**: New video encoding method.
-  
-## Features
+git clone https://github.com/RealEkjotsingh/live-minecraft-weather-wallpaper.git
+Open Wallpaper Engine
 
-- **Minecraft-Themed Digital Clock**: Displays the current time inside a Minecraft world, with time-based visual transitions.
-- **Dynamic Background**: The wallpaper automatically switches between different backgrounds depending on the time of day (morning, afternoon, evening, night).
-- **Weather-Based Animations**: Sync the wallpaper with real-world weather using the [OpenWeatherMap API](https://openweathermap.org/).
-- **Sound Effects**:
-  - **Piston Sound**: Included by default. Plays every time the clock changes.
-  - **Background Sound**: Optional. Users can add their own background audio file in `.ogg` format.
-- **Customizable Weather for Your Town**: Set your location to get current weather.
+Go to:
 
-## Setup Guide
+My Projects → Create Wallpaper
+Select the project folder
+Run and enjoy 🚀
 
-### Requirements
+⚠️ This project is built specifically for Wallpaper Engine and may not work correctly in a normal browser.
 
-1. [Wallpaper Engine](https://store.steampowered.com/app/431960/Wallpaper_Engine/).
-2. A [free OpenWeatherMap API key](https://openweathermap.org/api).
-3. Background sound file in `.ogg` format (optional).
+🌍 Location Handling
+🟢 Auto Mode
+Uses IP-based APIs (ipwho, ipapi)
+Detects your city automatically
+Displays detected city in UI
 
-### Adding Background Sound
+⚠️ Note: Auto detection may fail inside Wallpaper Engine due to network/permission limits
 
-> **Note**: Piston sound effects are included by default, but the background sound is not. You will need to provide your own background sound file.
+🔁 Smart Fallback Logic
 
-To add your own custom background audio, you need an audio file in `.ogg` format:
+If auto fails:
 
-1. Find or convert your preferred background sound to `.ogg` format (you can use an online converter if necessary).
-2. Place the `.ogg` file in the following directory inside the wallpaper folder:
-   ```bash
-   /resources/sound/backgroundAudio.ogg
-4. The sound will automatically play as background audio when the wallpaper is active. Volumen can be changed in settings.
+🕘 After 9 AM → Noida
+🌆 Evening (after 6 PM) → Faridabad
+📅 Saturday & Sunday → Faridabad
 
-### Enabling Weather API Integration
+You can change this inside code:
 
-1. Get an API key from OpenWeatherMap.
-2. In the Wallpaper Engine wallpaper settings, enable the wallpaper, copy the API, and set the town. (The wallpaper updates the weather every 3 minutes.)
+// Example fallback logic
+const hour = new Date().getHours();
+const day = new Date().getDay(); // 0 = Sunday
 
-### Customization
+if (day === 0 || day === 6) {
+  fetchWeather(28.4333, 77.3167); // Faridabad
+} else if (hour >= 18) {
+  fetchWeather(28.4333, 77.3167); // Evening → Faridabad
+} else {
+  fetchWeather(28.57, 77.32); // Day → Noida
+}
+🖱️ Manual Location Selection
+Long press anywhere on screen
+Location selector will appear
+Click any city to switch instantly
+🛠 Customization
 
-In the Wallpaper Engine settings, you can configure different background animations based on the weather and time of day. If you set it to cycle, it will automatically change according to the time of day. The repository also includes a `save.zip` file that contains two Minecraft worlds for snowy and normal weather, allowing you to modify the world and record footage for your wallpaper. All recordings can be found in the `resources/clock` folder.
+You can modify:
 
-Recordings should be made with the segments turned off, and you should also take a picture with the segments turned on. If you change the clock position, you will need to modify the display segment positions located in `properties.js`. The segments are labeled from A to G, following a standard naming convention. The first two values represent the top-right pixel position of a segment, while the second two values represent the bottom-left corner. You can obtain these positions by hovering the mouse over the pixel in most editors, such as GIMP. The piston sound can also be changed by replacing the `piston.ogg` file in the `/resources/sound` directory.
+🌍 Fallback locations
+🧠 Time-based logic
+📅 Weekend behavior
+🌧️ Rain intensity thresholds
+☁️ Cloud percentage logic
+🎨 UI text & layout
+📊 Weather Logic (Important)
+Rain Detection
+Based on:
+precip_mm (actual rainfall)
+chance_of_rain (%)
+Example:
+Condition	Output
+0 mm	No rain
+0–1 mm	Drizzle
+1–5 mm	Light Rain
+5–15 mm	Moderate Rain
+15+ mm	Heavy Rain
+Cloud Logic
+Cloud %	Visual
+< 25%	Clear sky
+25–60%	Few clouds
+60%+	Cloudy
+⚙️ Tech Stack
+JavaScript
+WeatherAPI
+Wallpaper Engine
+🚀 Future Improvements
+🔊 Rain sound based on intensity
+⚡ Lightning & thunder effects
+🌫 Fog & atmosphere depth
+🎯 GPU-based particle optimization
+📌 Notes
+Auto detection may not always work due to Wallpaper Engine restrictions
+API-based weather can have slight delays
+Optimized for performance (low GPU usage)
+❤️ Support / Donate
 
-### Installation
+If you like this project, you can support me:
 
-You can download the wallpaper directly from the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3339891336).
-Or clone the repository:
-   ```bash
-   git clone https://github.com/blazjerman/Minecraft-digital-clock.git
-  ```
+💰 PayPal: 1llekjotsingh@gmail.com
+📱 UPI: 8800638800@slc
+⭐ Show some love
 
-## Donate
+If this project helped you or you liked it:
 
-- [Ko-fi](https://ko-fi.com/blazjerman)
+👉 Give it a star ⭐ on GitHub
