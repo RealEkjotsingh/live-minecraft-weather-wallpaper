@@ -523,6 +523,15 @@ const locations = [
   { name: "BANGALORE", value: "bengaluru,IN" },
   { name: "FARIDABAD", value: "faridabad,IN" },
   { name: "GURGAON", value: "gurgaon,IN" },
+  { name: "LEH", value: "leh,IN" },
+  { name: "MANALI", value: "manali,IN" },
+  { name: "SRINAGAR", value: "srinagar,IN" },
+  { name: "AULI", value: "auli,IN" },
+
+  // 🇨🇦 CANADA
+  { name: "TORONTO", value: "toronto,CA" },
+  { name: "VANCOUVER", value: "vancouver,CA" },
+  { name: "CALGARY", value: "calgary,CA" },
 
   // 🇬🇧 UK
   { name: "LONDON", value: "london,GB" },
@@ -534,6 +543,10 @@ const locations = [
   { name: "CHICAGO", value: "chicago,US" },
   { name: "SAN FRANCISCO", value: "san francisco,US" },
   { name: "SEATTLE", value: "seattle,US" },
+  // 🇺🇸 USA (snow-heavy cities)
+  { name: "DENVER", value: "denver,US" },
+  { name: "MINNEAPOLIS", value: "minneapolis,US" },
+  { name: "ANCHORAGE", value: "anchorage,US" },
 
   // 🇦🇪 UAE
   { name: "DUBAI", value: "dubai,AE" },
@@ -541,6 +554,9 @@ const locations = [
 
   // 🇯🇵 JAPAN
   { name: "TOKYO", value: "tokyo,JP" },
+
+  // 🇯🇵 JAPAN (heavy snow region)
+  { name: "SAPPORO", value: "sapporo,JP" },
 
   // 🇸🇬 SINGAPORE
   { name: "SINGAPORE", value: "singapore,SG" },
@@ -553,6 +569,21 @@ const locations = [
   { name: "PARIS", value: "paris,FR" },
   { name: "BERLIN", value: "berlin,DE" },
   { name: "ROME", value: "rome,IT" },
+  // 🇨🇭 EUROPE (Alps)
+  { name: "ZURICH", value: "zurich,CH" },
+  { name: "GENEVA", value: "geneva,CH" },
+  { name: "INNSBRUCK", value: "innsbruck,AT" },
+  // 🇳🇴 SCANDINAVIA
+  { name: "OSLO", value: "oslo,NO" },
+  { name: "HELSINKI", value: "helsinki,FI" },
+
+  // 🇮🇸 ICELAND
+  { name: "REYKJAVIK", value: "reykjavik,IS" },
+  // 🇦🇶 ANTARCTICA (Research Stations)
+  { name: "MCMURDO", value: "-77.8419,166.6863" },
+  { name: "AMUNDSEN", value: "-90,0" }, // South Pole
+  { name: "VOSTOK", value: "-78.4645,106.8326" },
+  { name: "PALMER", value: "-64.7742,-64.0536" },
 ];
 let currentIndex = 0;
 
@@ -644,8 +675,23 @@ function fetchWeatherByCity(city) {
       let fakeId = 800;
 
       if (condition.includes("thunder")) fakeId = 200;
-      else if (condition.includes("snow")) fakeId = 600;
+      // ❄️ ADVANCED SNOW DETECTION
       else if (
+        condition.includes("snow") ||
+        condition.includes("blizzard") ||
+        condition.includes("ice") ||
+        condition.includes("sleet") ||
+        condition.includes("freezing") ||
+        condition.includes("blowing")
+      ) {
+        fakeId = 600;
+      } else if (
+        isRaining ||
+        condition.includes("rain") ||
+        condition.includes("drizzle")
+      ) {
+        fakeId = 500;
+      } else if (
         isRaining ||
         condition.includes("rain") ||
         condition.includes("drizzle")
@@ -663,6 +709,7 @@ function fetchWeatherByCity(city) {
           temp: current.temp_c,
           humidity: current.humidity,
         },
+        snow_chance: data.forecast.forecastday[0].day.daily_chance_of_snow,
         uv: current.uv,
         conditionText: current.condition.text,
         wind: {
@@ -712,8 +759,23 @@ function fetchWeather(lat, lon) {
       let fakeId = 800;
 
       if (condition.includes("thunder")) fakeId = 200;
-      else if (condition.includes("snow")) fakeId = 600;
+      // ❄️ ADVANCED SNOW DETECTION
       else if (
+        condition.includes("snow") ||
+        condition.includes("blizzard") ||
+        condition.includes("ice") ||
+        condition.includes("sleet") ||
+        condition.includes("freezing") ||
+        condition.includes("blowing")
+      ) {
+        fakeId = 600;
+      } else if (
+        isRaining ||
+        condition.includes("rain") ||
+        condition.includes("drizzle")
+      ) {
+        fakeId = 500;
+      } else if (
         isRaining ||
         condition.includes("rain") ||
         condition.includes("drizzle")
@@ -747,6 +809,7 @@ function fetchWeather(lat, lon) {
           temp: current.temp_c,
           humidity: current.humidity,
         },
+        snow_chance: data.forecast.forecastday[0].day.daily_chance_of_snow,
         uv: current.uv,
         conditionText: current.condition.text,
         wind: {
@@ -779,28 +842,66 @@ function renderWeather(resp) {
   weatherData.style.opacity = "1"; // force visible
   console.log("RENDER:", resp.name, resp.sys.country);
   requests++;
+
+  const rainIntensity = resp.precip;
+  const conditionText = resp.conditionText.toLowerCase();
   let precipPercent = resp.chance_of_rain || 0;
 
   if (!precipPercent || precipPercent === 0) {
-    // fallback if API gives 0 but it's cloudy
     precipPercent = Math.round(resp.clouds.all * 0.7);
   }
+  let rainText = "";
 
-  // 🌧️ RAIN INTENSITY
-  const rainIntensity = resp.precip;
+  // 🌧 REAL RAIN logic...
+  if (rainIntensity > 0) {
+    if (rainIntensity < 0.5) rainText = "DRIZZLE";
+    else if (rainIntensity < 2) rainText = "LIGHT RAIN";
+    else if (rainIntensity < 7) rainText = "RAIN";
+    else rainText = "HEAVY RAIN";
+  } else if (precipPercent >= 80) {
+    rainText = "STORM LIKELY";
+  } else if (precipPercent >= 50) {
+    rainText = "SHOWERS LIKELY";
+  } else if (precipPercent >= 25) {
+    rainText = "RAIN POSSIBLE";
+  }
 
-  let rainLevel = "none";
-  if (rainIntensity === 0) rainLevel = "none";
-  else if (rainIntensity < 0.5) rainLevel = "drizzle";
-  else if (rainIntensity < 2) rainLevel = "light";
-  else if (rainIntensity < 7) rainLevel = "moderate";
-  else rainLevel = "heavy";
+  // ✅ NOW define it
+  const rainDisplay = rainText || "";
+
+  // else → keep empty (no rain info)
+  let rainLabel = "";
+
+  // ✅ PRIORITY 1: REAL RAIN
+  if (rainIntensity > 0) {
+    if (rainIntensity < 0.5) rainLabel = "DRIZZLE";
+    else if (rainIntensity < 2) rainLabel = "LIGHT RAIN";
+    else if (rainIntensity < 7) rainLabel = "RAIN";
+    else rainLabel = "HEAVY RAIN";
+  }
+
+  // ✅ PRIORITY 2: API SAYS RAIN BUT NO ACTUAL RAIN
+  else if (
+    conditionText.includes("rain") ||
+    conditionText.includes("thunder")
+  ) {
+    rainLabel = "RAIN LIKELY"; // 🔥 THIS IS THE FIX
+  }
+
+  // else → no rain label
 
   // ☁️ CLOUD %
   const cloudinessRaw = resp.clouds.all;
 
   // 🎯 FINAL WEATHER TYPE (SINGLE SOURCE OF TRUTH)
-  if (rainIntensity > 0) {
+  const isSnowingNow = resp.weather[0].id === 600;
+  const snowChance = resp.snow_chance || 0;
+
+  if (isSnowingNow) {
+    weatherType = "Snow"; // ❄️ LIVE SNOW
+  } else if (snowChance > 50 && resp.main.temp <= 2) {
+    weatherType = "Snow"; // ❄️ UPCOMING SNOW
+  } else if (rainIntensity > 0.5) {
     weatherType = "Rain";
   } else if (cloudinessRaw <= 25) {
     weatherType = "Clear";
@@ -809,7 +910,18 @@ function renderWeather(resp) {
   } else {
     weatherType = "Clouds";
   }
+  // 🎯 weather type decided first
 
+  if (weatherType === "Snow") {
+    precipPercent = resp.snow_chance || precipPercent;
+  }
+
+  let snowLabel = "";
+
+  if (weatherType === "Snow") {
+    if (isSnowingNow) snowLabel = "SNOWING";
+    else snowLabel = "SNOW LIKELY";
+  }
   // ☁️ LABEL FOR UI
   let cloudLabel = "CLEAR";
   if (cloudinessRaw > 25 && cloudinessRaw <= 60) cloudLabel = "PARTLY CLOUDY";
@@ -894,8 +1006,19 @@ WIND ${windKmh} km/h
 
 <!-- RIGHT -->
 <span style="color:#ffffff;">
-<span style="color:#00eaff;">${cityCode}, ${countryCode}</span>  · RAIN CHANCE ${precipPercent}% · ${rainIntensity.toFixed(1)}mm  · HUM ${resp.main.humidity}% · ${timeLabel}
+<span style="color:#00eaff;">${cityCode}, ${countryCode}</span>  
 
+${
+  weatherType === "Snow"
+    ? `· ${snowLabel} · ${snowChance}%`
+    : rainIntensity > 0
+      ? `· ${rainText} · ${rainIntensity.toFixed(2)}mm`
+      : rainDisplay
+        ? `· ${rainDisplay}`
+        : `· RAIN CHANCE ${precipPercent}%`
+}
+
+· HUM ${resp.main.humidity}% · ${timeLabel}
 </span>
 
 </span>

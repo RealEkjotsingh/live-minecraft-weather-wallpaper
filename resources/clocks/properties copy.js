@@ -162,19 +162,20 @@ const midnight_snow = {
 
 // Night
 
-const evening_clear = {
-  name: "Evening clear",
-  clockPath: "night/clear.png", // keep same asset
+const night_clear = {
+  name: "Night clear",
+  clockPath: "night/clear.png",
   backgroundPath: "night/clear.webm",
 
   width: day_clear.width,
   height: day_clear.height,
 
-  startingHour: 16, // 🔥 evening start
+  startingHour: 20,
 
   displays: day_clear.displays,
   dot: day_clear.dot,
 };
+
 // Noon
 
 const noon_clear = {
@@ -213,7 +214,7 @@ const noon_snow = day_snow;
 const clocks = [
   {
     weather: ["Clear"],
-   types: [day_clear, noon_clear, evening_clear, midnight_clear]
+    types: [day_clear, midnight_clear, night_clear, noon_clear],
   },
   {
     weather: [

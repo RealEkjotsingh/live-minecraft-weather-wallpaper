@@ -74,59 +74,6 @@ const displayChars = {
   8: ["A", "B", "C", "D", "E", "F", "G"],
   9: ["A", "B", "C", "D", "F", "G"],
 };
-const logToggleBtn = document.createElement("span");
-
-logToggleBtn.innerHTML = "➤";
-logToggleBtn.id = "logToggleBtn";
-logToggleBtn.style.pointerEvents = "auto";
-weatherData.style.pointerEvents = "none";
-Object.assign(logToggleBtn.style, {
-  position: "fixed",
-  top: "20px",
-  right: "20px",
-  zIndex: "10000",
-  fontFamily: "Minecraft",
-  fontSize: "14px",
-  color: "#00eaff",
-  cursor: "pointer",
-  letterSpacing: "1px",
-  textShadow: "0 0 6px #000",
-  userSelect: "none",
-});
-
-document.body.appendChild(logToggleBtn);
-const logTooltip = document.createElement("span");
-
-logTooltip.innerText = "Toggle Weather Log";
-
-Object.assign(logTooltip.style, {
-  position: "fixed",
-  top: "35px",
-  right: "60px",
-
-  transform: "translateY(-50%)",
-
-  background: "rgb(0, 0, 0)",
-  color: "#fff",
-
-  padding: "4px 8px",
-  borderRadius: "6px",
-
-  fontFamily: "Minecraft",
-  fontSize: "11px",
-  letterSpacing: "1px",
-
-  opacity: "0",
-  transition: "opacity 0.2s ease",
-
-  pointerEvents: "none",
-  zIndex: "10002",
-
-  backdropFilter: "blur(4px)",
-  whiteSpace: "nowrap",
-});
-
-document.body.appendChild(logTooltip);
 
 const defaultClock = clocks[0].types;
 const rainCanvas = document.createElement("canvas");
@@ -454,36 +401,53 @@ function updateWeatherAuto(retry = 0) {
     });
 }
 function handleAutoLocation(lat, lon, cityName) {
-  if (mode !== "auto" && mode !== "fallback") return;
+  if (mode !== "auto" && mode !== "fallback") return; // ✅ FIXED
 
   console.log("AUTO LOCATION:", cityName);
 
-  // 🔥 ALWAYS use coordinates first
-  fetchWeather(lat, lon);
+  currentIndex = 0;
 
-  // THEN try mapping city (optional)
   const city = cityName?.toLowerCase() || "";
 
-  if (city.includes("faridabad")) window.autoDetectedCity = "FBD";
-  else if (city.includes("noida")) window.autoDetectedCity = "NOI";
-  else if (city.includes("delhi")) window.autoDetectedCity = "DEL";
-  else if (city.includes("gurgaon") || city.includes("gurugram"))
-    window.autoDetectedCity = "GGN";
-  else {
-    // fallback based on distance
-    let closestCity = cityCenters[0];
-    let minDistance = Infinity;
-
-    for (const c of cityCenters) {
-      const dist = getDistance(lat, lon, c.lat, c.lon);
-      if (dist < minDistance) {
-        minDistance = dist;
-        closestCity = c;
-      }
-    }
-
-    window.autoDetectedCity = closestCity.name;
+  if (city.includes("faridabad")) {
+    window.autoDetectedCity = "FBD";
+    return fetchWeather(28.4089, 77.3178);
   }
+
+  if (city.includes("noida")) {
+    window.autoDetectedCity = "NOI";
+    return fetchWeather(28.5355, 77.391);
+  }
+
+  if (city.includes("delhi")) {
+    window.autoDetectedCity = "DEL";
+    return fetchWeather(28.6139, 77.209);
+  }
+
+  if (city.includes("gurgaon") || city.includes("gurugram")) {
+    window.autoDetectedCity = "GGN";
+    return fetchWeather(28.4595, 77.0266);
+  }
+
+  if (city.includes("ghaziabad")) {
+    window.autoDetectedCity = "GZB";
+    return fetchWeather(lat, lon);
+  }
+
+  // fallback to nearest
+  let closestCity = cityCenters[0];
+  let minDistance = Infinity;
+
+  for (const c of cityCenters) {
+    const dist = getDistance(lat, lon, c.lat, c.lon);
+    if (dist < minDistance) {
+      minDistance = dist;
+      closestCity = c;
+    }
+  }
+
+  window.autoDetectedCity = closestCity.name;
+  fetchWeather(closestCity.lat, closestCity.lon);
 }
 
 function fetchIPLocation() {
@@ -938,7 +902,6 @@ function fetchWeather(lat, lon) {
 }
 
 function renderWeather(resp) {
-  if (!weatherVisible) return;
   weatherData.style.opacity = "1"; // force visible
   console.log("RENDER:", resp.name, resp.sys.country);
   requests++;
@@ -978,7 +941,7 @@ function renderWeather(resp) {
   }
 
   // ✅ NOW define it
-  const rainDisplay = (rainText || "").toUpperCase();
+ const rainDisplay = (rainText || "").toUpperCase();
 
   // else → keep empty (no rain info)
   let rainLabel = "";
@@ -1046,7 +1009,6 @@ function renderWeather(resp) {
   const hour = cityLocalTime.getHours();
 
   let timeLabel = "";
-
   const isDay = hour >= 6 && hour < 19;
   if (hour >= 5 && hour < 8) timeLabel = "SUNRISE";
   else if (hour >= 8 && hour < 12) timeLabel = "MORNING";
@@ -1054,20 +1016,6 @@ function renderWeather(resp) {
   else if (hour >= 16 && hour < 19) timeLabel = "EVENING";
   else if (hour >= 19 && hour < 23) timeLabel = "NIGHT";
   else timeLabel = "MIDNIGHT";
-
-  let visualTime = "day";
-
-  if (timeLabel === "MIDNIGHT") {
-    visualTime = "midnight";
-  } else if (timeLabel === "NIGHT") {
-    visualTime = "midnight";
-  } else if (timeLabel === "EVENING") {
-    visualTime = "night";
-  } else if (timeLabel === "AFTERNOON") {
-    visualTime = "noon";
-  } else {
-    visualTime = "day";
-  }
 
   // 🔥 RESET FIRST (VERY IMPORTANT)
   clockTypes = defaultClock;
@@ -1077,7 +1025,7 @@ function renderWeather(resp) {
   for (const clock of clocks) {
     if (
       clock.weather.includes(weatherType) &&
-      (!clock.time || clock.time.includes(visualTime))
+      (!clock.time || clock.time.includes(isDay ? "day" : "night"))
     ) {
       clockTypes = clock.types;
       updateClock(true);
@@ -1162,39 +1110,20 @@ ${
 
 let weatherVisible = true;
 
-weatherData.style.transition = "opacity 0.4s ease";
+weatherData.style.opacity = "1";
+weatherData.style.transition = "opacity 0.8s ease";
 
-logToggleBtn.addEventListener("mouseenter", () => {
-  logToggleBtn.style.opacity = "1";
-  logToggleBtn.style.transform =
-    
-
-  logTooltip.style.opacity = "1";
-});
-
-logToggleBtn.addEventListener("mouseleave", () => {
-  logToggleBtn.style.opacity = "0.7";
-  logToggleBtn.style.transform =
-  
-  logTooltip.style.opacity = "0";
-});
-// setInterval(() => {
-
-logToggleBtn.addEventListener("click", () => {
+/* 🟢 CLICK TO TOGGLE (reliable in wallpaper engine) */
+document.addEventListener("click", (e) => {
+  if (e.target.id === "modeToggle") return; // 🔥 ignore mode clicks
   weatherVisible = !weatherVisible;
-
-  weatherData.style.opacity = weatherVisible ? "1" : "0";
-
-  setTimeout(() => {
-    weatherData.style.display = weatherVisible ? "block" : "none";
-  }, 300);
-
-  logToggleBtn.innerHTML = weatherVisible ? "➤" : "◀";
 });
-//   if (!enableWeatherLog) return;
 
-//   weatherData.style.opacity = "1";
-// }, 1000);
+setInterval(() => {
+  if (!enableWeatherLog) return;
+
+  weatherData.style.opacity = "1";
+}, 1000);
 
 setInterval(() => updateClock(false), timeUpdateInterval);
 // setInterval(() => updateWeather(), weatherUpdateInterval);

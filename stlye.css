@@ -41,7 +41,7 @@ img {
 }
 
 div {
-  animation: fadeIn 4s;
+  animation: cubic-bezier(0.075, 0.82, 0.165, 1) 0.1s;
 }
 
 @media (max-aspect-ratio: 16/9) {
@@ -63,7 +63,7 @@ div {
 #locationSelector,
 #locationSelector span,
 #modeToggle {
-  pointer-events: pointer !important;
+  pointer-events: auto !important;
 }
 #locationSelector {
   /* display: inline-flex !important; */
@@ -76,13 +76,20 @@ div {
 
   padding: 6px 14px !important;
 }
-
-/* #weatherData {
+#logToggleBtn {
+  pointer-events: auto !important;
+  font-size: 18px !important;
+  opacity: 0.6 !important;
+  transition: opacity 0.3s ease !important;
   position: fixed !important;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 9999;
-} */
+  top: 10px !important;
+  right: 20px !important;
+  z-index: 10001 !important;
+  max-height: fit-content !important;
+  display: flex !important;
+}
+#logToggleBtn:hover {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+
+}
